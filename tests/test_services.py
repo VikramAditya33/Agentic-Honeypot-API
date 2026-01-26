@@ -12,7 +12,7 @@ async def test_scam_detection_bank_fraud():
     message = "Your account will be blocked. Send ₹500 to verify@upi"
     result = await detector.detect_scam(message, {})
     
-    assert result.is_scam == True
+    assert result.is_scam
     assert result.confidence > 0.5
     assert result.scam_type in ["bank_fraud", "upi_scam", "payment_scam"]
 
@@ -24,7 +24,7 @@ async def test_scam_detection_upi_scam():
     message = "Congratulations! You won ₹50,000. Pay ₹500 to winner@paytm to claim"
     result = await detector.detect_scam(message, {})
     
-    assert result.is_scam == True
+    assert result.is_scam
     assert result.confidence > 0.5
 
 
@@ -110,7 +110,7 @@ async def test_agent_message_analysis():
     analysis = await agent.analyze_scammer_message(message)
     
     assert analysis["urgency_level"] == "high"
-    assert analysis["threat_detected"] == True
+    assert analysis["threat_detected"]
     assert analysis["request_type"] == "payment"
 
 
@@ -136,17 +136,28 @@ async def test_agent_multi_turn_context():
     assert len(response) < 500
 
 
-def test_regex_patterns():
-    """Test regex pattern matching"""
+def test_regex_pattern_upi():
+    """Test regex pattern matching for UPI IDs"""
     extractor = IntelligenceExtractor()
-    
     message = "Pay to test@paytm"
     intel = extractor._extract_with_regex(message)
     assert len(intel.upiIds) >= 1
-    
+
+
+def test_regex_pattern_phone():
+    """Test regex pattern matching for phone numbers"""
+    extractor = IntelligenceExtractor()
     message = "Call +919876543210"
     intel = extractor._extract_with_regex(message)
     assert len(intel.phoneNumbers) >= 1
+
+
+def test_regex_pattern_url():
+    """Test regex pattern matching for URLs"""
+    extractor = IntelligenceExtractor()
+    message = "Visit http://example.com"
+    intel = extractor._extract_with_regex(message)
+    assert len(intel.phishingLinks) >= 1
     
     message = "Visit http://example.com"
     intel = extractor._extract_with_regex(message)

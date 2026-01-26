@@ -163,4 +163,4 @@ async def test_manual_callback_endpoint():
             headers={"x-api-key": settings.api_key}
         )
         
-        assert response.status_code in [200, 500]
+        assert response.status_code == 200

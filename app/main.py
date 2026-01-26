@@ -177,7 +177,9 @@ async def honeypot_endpoint(request: Request, honeypot_request: HoneypotRequest)
                 analytics.record_scammer_behavior("link_sharing")
             if message_analysis.get("emotional_manipulation"):
                 analytics.record_scammer_behavior("emotional_manipulation")
+            
             language = honeypot_request.metadata.language if honeypot_request.metadata else "English"
+            
             agent_response = await agent.generate_response(
                 honeypot_request.sessionId,
                 honeypot_request.message.text,
@@ -185,7 +187,7 @@ async def honeypot_endpoint(request: Request, honeypot_request: HoneypotRequest)
                 session.scam_type,
                 language=language
             )
-            turn_number = len(honeypot_request.conversationHistory) // 2 + 1
+            
             agent_note = agent.generate_agent_note(
                 session.scam_type,
                 message_analysis,

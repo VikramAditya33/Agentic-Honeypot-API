@@ -77,7 +77,7 @@ async def test_full_conversation_bank_fraud():
             assert response.status_code == 200
             data = response.json()
             
-            assert data["scamDetected"] == True
+            assert data["scamDetected"] 
             
             assert len(data["agentResponse"]) > 0
             
@@ -132,7 +132,7 @@ async def test_full_conversation_upi_scam():
             
             assert response.status_code == 200
             data = response.json()
-            assert data["scamDetected"] == True
+            assert data["scamDetected"] 
             
             history.append(payload["message"])
             history.append({

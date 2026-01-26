@@ -1,16 +1,16 @@
 """
 Enhanced intelligence models with confidence scoring
 """
-from pydantic import BaseModel
-from typing import List, Optional
+from pydantic import BaseModel, Field
+from typing import List, Optional, Literal
 from datetime import datetime
 
 
 class IntelligenceItem(BaseModel):
     """Individual intelligence item with metadata"""
     value: str
-    confidence: float
-    source: str
+    confidence: float = Field(ge=0.0, le=1.0, description="Confidence score from 0.0 to 1.0")
+    source: Literal["regex", "llm", "both"] = Field(description="Extraction method")
     extracted_at: str
     message_turn: int
 
