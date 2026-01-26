@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     port: int = 8000
     
     # Groq Configuration - supports multiple keys
-    groq_api_keys: str  # Comma-separated list of API keys
+    groq_api_keys: str
     groq_model: str = "llama-3.3-70b-versatile"
     
     # Upstash Redis

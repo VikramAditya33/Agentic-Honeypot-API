@@ -35,7 +35,6 @@ async def test_scam_detection_legitimate():
     message = "Hello, how are you today?"
     result = await detector.detect_scam(message, {})
     
-    # Should have low confidence or not be scam
     assert result.confidence < 0.7 or result.is_scam == False
 
 
@@ -98,8 +97,7 @@ async def test_agent_response_generation():
     )
     
     assert len(response) > 0
-    assert len(response) < 500  # Should be brief
-    # Should not reveal scam detection
+    assert len(response) < 500
     assert "scam" not in response.lower()
 
 
@@ -135,7 +133,6 @@ async def test_agent_multi_turn_context():
     )
     
     assert len(response) > 0
-    # Response should be contextual (not just generic)
     assert len(response) < 500
 
 
@@ -143,17 +140,14 @@ def test_regex_patterns():
     """Test regex pattern matching"""
     extractor = IntelligenceExtractor()
     
-    # Test UPI pattern
     message = "Pay to test@paytm"
     intel = extractor._extract_with_regex(message)
     assert len(intel.upiIds) >= 1
     
-    # Test phone pattern
     message = "Call +919876543210"
     intel = extractor._extract_with_regex(message)
     assert len(intel.phoneNumbers) >= 1
     
-    # Test URL pattern
     message = "Visit http://example.com"
     intel = extractor._extract_with_regex(message)
     assert len(intel.phishingLinks) >= 1

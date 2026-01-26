@@ -12,7 +12,6 @@ class ConversationAnalytics:
     """Track conversation patterns and effectiveness"""
     
     def __init__(self):
-        # Track when intelligence is extracted
         self.intelligence_extraction_turns: Dict[str, List[int]] = {
             "upiIds": [],
             "bankAccounts": [],
@@ -20,10 +19,8 @@ class ConversationAnalytics:
             "phishingLinks": []
         }
         
-        # Track agent response effectiveness
         self.response_effectiveness: Dict[str, int] = {}
         
-        # Track scammer behavior patterns
         self.scammer_patterns: Dict[str, int] = {
             "urgency_tactics": 0,
             "threats": 0,
@@ -33,13 +30,10 @@ class ConversationAnalytics:
             "emotional_manipulation": 0
         }
         
-        # Track success rate by scam type
         self.scam_type_stats: Dict[str, Dict] = {}
         
-        # Track conversation lengths
         self.conversation_lengths: List[int] = []
         
-        # Track extraction timeline
         self.extraction_timeline: List[Dict] = []
     
     def record_intelligence_extraction(
@@ -69,7 +63,6 @@ class ConversationAnalytics:
         led_to_extraction: bool
     ):
         """Track which responses lead to intelligence extraction"""
-        # Simplified tracking - count effective responses
         key = "effective" if led_to_extraction else "ineffective"
         self.response_effectiveness[key] = self.response_effectiveness.get(key, 0) + 1
     
@@ -112,7 +105,6 @@ class ConversationAnalytics:
     
     def get_most_effective_responses(self, top_n: int = 5) -> List[str]:
         """Get most effective agent responses (placeholder)"""
-        # This would require more detailed tracking
         return ["Responses that led to extraction would be tracked here"]
     
     def get_scammer_behavior_summary(self) -> Dict:
@@ -178,5 +170,4 @@ class ConversationAnalytics:
         logger.info("============================")
 
 
-# Global analytics instance
 analytics = ConversationAnalytics()

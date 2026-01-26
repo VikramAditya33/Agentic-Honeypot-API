@@ -9,8 +9,6 @@ class APIKeyMiddleware(BaseHTTPMiddleware):
         # Skip auth for health check, metrics, and analytics endpoints
         if request.url.path in ["/health", "/metrics", "/analytics"]:
             return await call_next(request)
-        
-        # Check for API key in headers
         api_key = request.headers.get("x-api-key")
         
         if not api_key:

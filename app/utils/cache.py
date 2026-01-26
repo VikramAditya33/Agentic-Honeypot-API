@@ -25,8 +25,6 @@ class SimpleCache:
         if key in self.cache:
             self.access_count[key] = self.access_count.get(key, 0) + 1
             logger.debug(f"Cache hit for key: {key[:8]}...")
-            
-            # Record cache hit in metrics
             try:
                 from app.utils.metrics import metrics
                 metrics.record_cache_hit()
@@ -36,8 +34,6 @@ class SimpleCache:
             return self.cache[key]
         
         logger.debug(f"Cache miss for key: {key[:8]}...")
-        
-        # Record cache miss in metrics
         try:
             from app.utils.metrics import metrics
             metrics.record_cache_miss()

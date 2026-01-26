@@ -3,7 +3,7 @@ from typing import List, Optional
 
 
 class Message(BaseModel):
-    sender: str  # "scammer" or "user"
+    sender: str
     text: str
     timestamp: str
 

@@ -67,7 +67,6 @@ async def test_honeypot_endpoint_basic():
         assert response.status_code == 200
         data = response.json()
         
-        # Check response structure
         assert "status" in data
         assert "scamDetected" in data
         assert "agentResponse" in data
@@ -75,7 +74,6 @@ async def test_honeypot_endpoint_basic():
         assert "extractedIntelligence" in data
         assert "agentNotes" in data
         
-        # Check scam detection
         assert data["scamDetected"] == True
         assert len(data["agentResponse"]) > 0
 
@@ -87,7 +85,6 @@ async def test_multi_turn_conversation():
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         session_id = "test-session-002"
         
-        # First message
         payload1 = {
             "sessionId": session_id,
             "message": {
@@ -108,7 +105,6 @@ async def test_multi_turn_conversation():
         data1 = response1.json()
         agent_response1 = data1["agentResponse"]
         
-        # Second message
         payload2 = {
             "sessionId": session_id,
             "message": {
@@ -135,10 +131,8 @@ async def test_multi_turn_conversation():
         assert response2.status_code == 200
         data2 = response2.json()
         
-        # Check metrics increased
         assert data2["engagementMetrics"]["totalMessagesExchanged"] >= 2
         
-        # Check intelligence extraction
         intel = data2["extractedIntelligence"]
         assert "verify@paytm" in intel["upiIds"] or len(intel["upiIds"]) > 0
 
@@ -148,7 +142,6 @@ async def test_manual_callback_endpoint():
     """Test manual callback trigger endpoint"""
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
-        # First create a session
         payload = {
             "sessionId": "test-callback-001",
             "message": {
@@ -165,11 +158,9 @@ async def test_manual_callback_endpoint():
             headers={"x-api-key": settings.api_key}
         )
         
-        # Try to trigger callback
         response = await client.post(
             "/api/finalize-session/test-callback-001",
             headers={"x-api-key": settings.api_key}
         )
         
-        # Should succeed or fail gracefully
-        assert response.status_code in [200, 500]  # 500 if GUVI endpoint not reachable
+        assert response.status_code in [200, 500]

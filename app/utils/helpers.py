@@ -18,21 +18,13 @@ def should_trigger_callback(session: SessionData) -> bool:
         # Don't trigger if not a scam
         if not session.scam_detected:
             return False
-        
-        # Trigger conditions:
-        
-        # 1. Conversation depth reached (15+ messages)
         if session.message_count >= 15:
             logger.info(f"Callback trigger: Message count threshold reached ({session.message_count})")
             return True
-        
-        # 2. Maximum conversation turns reached (from config)
         from app.config import settings
         if session.message_count >= settings.max_conversation_turns:
             logger.info(f"Callback trigger: Max turns reached ({session.message_count})")
             return True
-        
-        # 3. Significant intelligence extracted (3+ data points)
         intel = session.extracted_intelligence
         total_intel = (
             len(intel.get("bankAccounts", [])) +

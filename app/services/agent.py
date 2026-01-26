@@ -45,8 +45,6 @@ class HoneypotAgent:
             strategy = "Show interest but ask for official information or proof. Be cautious."
         else:
             strategy = "Show willingness to cooperate. Ask for step-by-step instructions."
-        
-        # Add scam-type specific guidance
         if scam_type in SCAM_TYPE_STRATEGIES:
             strategy += f"\n\nScam type: {scam_type}"
             strategy += f"\nPersona: {SCAM_TYPE_STRATEGIES[scam_type]['persona']}"
@@ -93,30 +91,17 @@ class HoneypotAgent:
             Agent's response text
         """
         try:
-            # Get Groq client
             client = self.groq_manager.get_client()
             
             if not client:
                 return self._fallback_response(scam_type, len(conversation_history))
-            
-            # Build conversation context
             context = self._build_conversation_context(conversation_history)
-            
-            # Determine turn number (count user messages)
             turn_number = sum(1 for msg in conversation_history if msg.sender == "user") + 1
-            
-            # Get strategy for this turn
             strategy = self._get_strategy_for_turn(turn_number, scam_type)
-            
-            # Get language-specific system prompt
             system_prompt = LANGUAGE_PROMPTS.get(language, AGENT_SYSTEM_PROMPT)
-            
-            # Add language instruction if not English
             language_instruction = ""
             if language != "English":
                 language_instruction = f"\n\nIMPORTANT: Respond in {language} language. Match the language style of the scammer's message."
-            
-            # Build prompt
             prompt = f"""{context}
 
 Current message from scammer: "{current_message}"
@@ -130,8 +115,6 @@ Generate a natural, human-like response (1-3 sentences only). Remember:
 - Show appropriate emotions
 - Keep it brief and natural
 """
-            
-            # Call Groq API
             response = client.chat.completions.create(
                 model=settings.groq_model,
                 messages=[
@@ -147,11 +130,7 @@ Generate a natural, human-like response (1-3 sentences only). Remember:
                 temperature=0.8,  # Higher temperature for more natural variation
                 max_tokens=150
             )
-            
-            # Get response text
             agent_response = response.choices[0].message.content.strip()
-            
-            # Add human imperfections occasionally
             agent_response = self._add_human_imperfections(agent_response)
             
             logger.info(f"Session {session_id}: Generated response in {language} (turn {turn_number})")
@@ -206,13 +185,9 @@ Generate a natural, human-like response (1-3 sentences only). Remember:
             }
             
             message_lower = message.lower()
-            
-            # Check urgency
             urgency_keywords = ["urgent", "immediately", "now", "today", "asap", "hurry", "quick"]
             if any(keyword in message_lower for keyword in urgency_keywords):
                 analysis["urgency_level"] = "high"
-            
-            # Check threats
             threat_keywords = ["blocked", "suspended", "closed", "terminated", "legal action", "police"]
             if any(keyword in message_lower for keyword in threat_keywords):
                 analysis["threat_detected"] = True
@@ -226,8 +201,6 @@ Generate a natural, human-like response (1-3 sentences only). Remember:
                 analysis["request_type"] = "link"
             elif any(x in message_lower for x in ["verify", "confirm", "update", "details"]):
                 analysis["request_type"] = "information"
-            
-            # Check emotional manipulation
             emotion_keywords = ["congratulations", "winner", "lucky", "selected", "prize", "free"]
             if any(keyword in message_lower for keyword in emotion_keywords):
                 analysis["emotional_manipulation"] = True

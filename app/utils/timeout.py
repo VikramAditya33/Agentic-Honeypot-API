@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 def async_timeout(seconds: int):
     """
-    Decorator to add timeout to async functions
+    Decorator to add timeout to asynchronous functions
     
     Usage:
         @async_timeout(5)

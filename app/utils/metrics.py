@@ -90,8 +90,6 @@ class MetricsCollector:
     def get_summary(self) -> Dict:
         """Get metrics summary"""
         uptime = (datetime.now(UTC) - self.start_time).total_seconds()
-        
-        # Calculate averages
         avg_response_time = (
             sum(self.response_times) / len(self.response_times)
             if self.response_times else 0
@@ -101,8 +99,6 @@ class MetricsCollector:
             sum(self.session_durations) / len(self.session_durations)
             if self.session_durations else 0
         )
-        
-        # Calculate rates
         scam_detection_rate = (
             self.scam_detections["scam"] / self.scam_detections["total"]
             if self.scam_detections["total"] > 0 else 0

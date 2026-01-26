@@ -4,8 +4,6 @@ import httpx
 import logging
 
 logger = logging.getLogger(__name__)
-
-# Create a shared httpx client with connection pooling
 # This client will be reused across all callback requests
 _http_client: httpx.AsyncClient = None
 
@@ -50,7 +48,6 @@ async def send_final_result_to_guvi(
         True if callback successful, False otherwise
     """
     try:
-        # Build payload according to GUVI specification
         payload = {
             "sessionId": session_id,
             "scamDetected": session_data.scam_detected,
@@ -69,11 +66,7 @@ async def send_final_result_to_guvi(
         logger.info(f"Payload: scamDetected={payload['scamDetected']}, "
                    f"messages={payload['totalMessagesExchanged']}, "
                    f"intelligence items={sum(len(v) for v in payload['extractedIntelligence'].values())}")
-        
-        # Get shared HTTP client with connection pooling
         client = get_http_client()
-        
-        # Send POST request to GUVI endpoint
         response = await client.post(
             settings.guvi_callback_url,
             json=payload,

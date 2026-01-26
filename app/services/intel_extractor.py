@@ -42,40 +42,25 @@ class IntelligenceExtractor:
         intel = ExtractedIntelligence()
         
         try:
-            # Extract UPI IDs
             upi_matches = re.findall(PATTERNS["upi_id"], message)
-            # Filter to only valid UPI patterns (has @ and common providers)
             upi_providers = ["paytm", "phonepe", "googlepay", "ybl", "oksbi", "okaxis", "okicici"]
             intel.upiIds = [
                 upi for upi in upi_matches 
                 if any(provider in upi.lower() for provider in upi_providers)
             ]
-            
-            # Extract bank account numbers (9-18 digits)
             bank_accounts = re.findall(PATTERNS["bank_account"], message)
-            # Filter out phone numbers (usually 10 digits)
             intel.bankAccounts = [acc for acc in bank_accounts if len(acc) > 10]
-            
-            # Extract phone numbers
             phone_matches = re.findall(PATTERNS["phone"], message)
-            # Filter valid Indian phone numbers
             intel.phoneNumbers = [
                 phone for phone in phone_matches 
                 if len(phone.replace("+", "").replace("-", "")) >= 10
             ]
-            
-            # Extract URLs
             url_matches = re.findall(PATTERNS["url"], message, re.IGNORECASE)
             intel.phishingLinks = list(set(url_matches))
-            
-            # Extract IFSC codes (for bank accounts)
             ifsc_matches = re.findall(PATTERNS["ifsc"], message)
             if ifsc_matches:
-                # Add IFSC to bank accounts list with context
                 for ifsc in ifsc_matches:
                     intel.bankAccounts.append(f"IFSC:{ifsc}")
-            
-            # Extract keywords
             message_lower = message.lower()
             found_keywords = [
                 keyword for keyword in SCAM_KEYWORDS 
@@ -93,7 +78,6 @@ class IntelligenceExtractor:
     async def _extract_with_llm(self, message: str) -> ExtractedIntelligence:
         """Layer 2: Extract intelligence using LLM"""
         try:
-            # Get Groq client
             client = self.groq_manager.get_client()
             
             if not client:
@@ -176,8 +160,6 @@ Rules:
         """Create enhanced intelligence with confidence scores"""
         enhanced = EnhancedIntelligence()
         timestamp = datetime.now(UTC).isoformat()
-        
-        # Process each type of intelligence
         for field in ["bankAccounts", "upiIds", "phishingLinks", "phoneNumbers", "suspiciousKeywords"]:
             regex_items = getattr(regex_intel, field)
             llm_items = getattr(llm_intel, field)
@@ -231,21 +213,14 @@ Rules:
             ExtractedIntelligence with all found data
         """
         try:
-            # Check cache first
             cache_key = generate_message_hash(message)
             cached_result = intelligence_cache.get(cache_key)
             
             if cached_result:
                 logger.info("Using cached intelligence extraction result")
                 return ExtractedIntelligence(**cached_result)
-            
-            # Layer 1: Regex extraction
             regex_intel = self._extract_with_regex(message)
-            
-            # Layer 2: LLM extraction
             llm_intel = await self._extract_with_llm(message)
-            
-            # Merge results
             final_intel = self._merge_intelligence(regex_intel, llm_intel)
             
             logger.info(f"Final extraction: {len(final_intel.upiIds)} UPIs, "

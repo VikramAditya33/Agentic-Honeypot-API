@@ -82,15 +82,12 @@ Respond in JSON format with:
             ScamDetectionResult with detection details
         """
         try:
-            # Check cache first
             cache_key = generate_message_hash(message)
             cached_result = scam_detection_cache.get(cache_key)
             
             if cached_result:
                 logger.info("Using cached scam detection result")
                 return ScamDetectionResult(**cached_result)
-            
-            # Get Groq client
             client = self.groq_manager.get_client()
             
             if not client:
@@ -98,11 +95,7 @@ Respond in JSON format with:
                 result = self._fallback_detection(message)
                 scam_detection_cache.set(cache_key, result.model_dump())
                 return result
-            
-            # Build prompt
             prompt = self._build_detection_prompt(message, metadata)
-            
-            # Call Groq API with JSON mode
             response = client.chat.completions.create(
                 model=settings.groq_model,
                 messages=[
@@ -119,8 +112,6 @@ Respond in JSON format with:
                 temperature=0.3,
                 max_tokens=500
             )
-            
-            # Parse response
             result_text = response.choices[0].message.content
             result_data = json.loads(result_text)
             
@@ -152,19 +143,11 @@ Respond in JSON format with:
         
         # Count keyword matches
         matches = sum(1 for keyword in scam_keywords if keyword in message_lower)
-        
-        # Check for URLs
         has_url = any(x in message_lower for x in ["http://", "https://", "bit.ly", "tinyurl"])
-        
-        # Check for money requests
         has_money_request = any(x in message_lower for x in ["₹", "rs", "rupees", "send money", "pay"])
-        
-        # Calculate confidence
         confidence = min(0.9, (matches * 0.15) + (0.2 if has_url else 0) + (0.3 if has_money_request else 0))
         
         is_scam = confidence > 0.5
-        
-        # Determine scam type
         scam_type = "not_scam"
         if is_scam:
             if "upi" in message_lower or has_money_request:

@@ -37,7 +37,6 @@ RESPONSE STYLE:
 """
 
 
-# Language-specific system prompts
 LANGUAGE_PROMPTS = {
     "English": AGENT_SYSTEM_PROMPT,
     

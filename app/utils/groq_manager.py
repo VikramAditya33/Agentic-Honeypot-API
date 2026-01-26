@@ -18,8 +18,6 @@ class GroqClientManager:
         self.current_index = 0
         self.lock = threading.Lock()
         self.clients = {}
-        
-        # Initialize clients for all keys
         for i, key in enumerate(self.api_keys):
             try:
                 self.clients[i] = Groq(api_key=key)
@@ -43,7 +41,6 @@ class GroqClientManager:
             return None
         
         with self.lock:
-            # Get current client
             client = self.clients.get(self.current_index)
             
             # Rotate to next key for next request

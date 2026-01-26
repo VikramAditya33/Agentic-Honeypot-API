@@ -123,8 +123,6 @@ class SessionManager:
             session = await self.get_session(session_id)
             if not session:
                 return False
-            
-            # Update session data
             session_dict = session.to_dict()
             session_dict.update(data)
             
@@ -147,12 +145,8 @@ class SessionManager:
             session = await self.get_session(session_id)
             if not session:
                 return False
-            
-            # Add message to history
             session.conversation_history.append(message.model_dump())
             session.message_count += 1
-            
-            # Update session
             return await self.update_session(session_id, {
                 "conversation_history": session.conversation_history,
                 "message_count": session.message_count
@@ -172,8 +166,6 @@ class SessionManager:
             session = await self.get_session(session_id)
             if not session:
                 return False
-            
-            # Merge intelligence (deduplicate)
             current = session.extracted_intelligence
             
             current["bankAccounts"] = list(set(
@@ -191,8 +183,6 @@ class SessionManager:
             current["suspiciousKeywords"] = list(set(
                 current.get("suspiciousKeywords", []) + intel.suspiciousKeywords
             ))
-            
-            # Update session
             return await self.update_session(session_id, {
                 "extracted_intelligence": current
             })
@@ -224,8 +214,6 @@ class SessionManager:
             session = await self.get_session(session_id)
             if not session:
                 return None
-            
-            # Calculate duration
             start_time = datetime.fromisoformat(session.start_time)
             duration = int((datetime.now(UTC) - start_time).total_seconds())
             

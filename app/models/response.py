@@ -18,7 +18,7 @@ class ExtractedIntelligence(BaseModel):
 class HoneypotResponse(BaseModel):
     status: str
     scamDetected: bool
-    agentResponse: str  # The actual reply to scammer
+    agentResponse: str
     engagementMetrics: EngagementMetrics
     extractedIntelligence: ExtractedIntelligence
     agentNotes: str

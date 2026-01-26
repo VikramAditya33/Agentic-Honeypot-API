@@ -9,10 +9,10 @@ from datetime import datetime
 class IntelligenceItem(BaseModel):
     """Individual intelligence item with metadata"""
     value: str
-    confidence: float  # 0.0 to 1.0
-    source: str  # "regex", "llm", "both"
+    confidence: float
+    source: str
     extracted_at: str
-    message_turn: int  # Which turn was this extracted
+    message_turn: int
 
 
 class EnhancedIntelligence(BaseModel):
