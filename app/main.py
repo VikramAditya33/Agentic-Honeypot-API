@@ -235,7 +235,9 @@ async def honeypot_endpoint(request: Request, honeypot_request: HoneypotRequest)
             )
         updated_session = await session_manager.get_session(honeypot_request.sessionId)
         agent_notes = " | ".join(updated_session.agent_notes) if updated_session else ""
-        response = HoneypotResponse(
+        
+        # Build full response for internal tracking
+        full_response = HoneypotResponse(
             status="success",
             scamDetected=session.scam_detected,
             agentResponse=agent_response,
@@ -245,9 +247,18 @@ async def honeypot_endpoint(request: Request, honeypot_request: HoneypotRequest)
         )
         
         logger.info(f"Session {honeypot_request.sessionId}: Response generated successfully")
+        
+        # Trigger callback if needed
         await trigger_callback_if_needed(honeypot_request.sessionId, updated_session)
         
-        return response
+        # Return simplified response format as per GUVI requirements
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={
+                "status": "success",
+                "reply": agent_response
+            }
+        )
     
     except Exception as e:
         logger.error(f"Error in honeypot endpoint: {e}", exc_info=True)
