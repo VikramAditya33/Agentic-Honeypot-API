@@ -192,7 +192,7 @@ pytest tests/ --cov=app --cov-report=html
 ## Tech Stack
 
 - **Framework:** FastAPI
-- **LLM:** Groq (Llama 3.1 70B)
+- **LLM:** Groq (Llama 3.3 70B)
 - **Database:** Upstash Redis
 - **HTTP Client:** httpx with connection pooling
 - **Rate Limiting:** slowapi
